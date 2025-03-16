@@ -513,6 +513,7 @@ function Home() {
             toast.success(`Approved, now sign the tx`)
             toast.dismiss(t)
 
+            console.log((token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata))
             // Sign
             contract.methods
               .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata)
@@ -537,8 +538,9 @@ function Home() {
             toast.dismiss(t)
           })
       } else {
+        console.log(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value)
         contract.methods
-          .lock(token, amountRef.current.value, periodRef.current.value, metadata)
+          .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata)
           .send({
             from: auth.accounts[0],
             value: 0,
@@ -559,6 +561,7 @@ function Home() {
     } catch (error) {
       console.log(error)
       toast.dismiss(t)
+      e.target.disabled = false
     }
   }
 
@@ -593,8 +596,13 @@ function Home() {
       toast.dismiss(t)
     }
   }
+
   useEffect(() => {
     console.clear()
+
+  contractReadonly.methods._lockCounter().call().then(console.log)
+
+    //getDataForTokenId().then(console.log)
 
     handleSearchProfile(auth.accounts[0]).then((profile) => {
       console.log(profile)
@@ -696,11 +704,16 @@ function Home() {
                 </li>
                 <li>
                   <button onClick={(e) => handleMint(e)}>Approve & lock</button>
-                  <button className='mt-10' onClick={() => {
-                    setPreviewNFT(false)
-                    setLsp7('')
-                    setLockModal(true)
-                  }}>🔙</button>
+                  <button
+                    className="mt-10"
+                    onClick={() => {
+                      setPreviewNFT(false)
+                      setLsp7('')
+                      setLockModal(true)
+                    }}
+                  >
+                    🔙
+                  </button>
                 </li>
               </ul>
             </>
@@ -738,12 +751,7 @@ function Home() {
           {!lockModal && !token && (
             <>
               <div className={`d-f-c grid--gap-1`}>
-                <button onClick={() => setLockModal(true)} disabled={!auth.walletConnected}>
-                  Lock
-                </button>
-                <button onClick={() => showCave()} disabled={!auth.walletConnected}>
-                  My Cave
-                </button>
+          
               </div>
             </>
           )}
