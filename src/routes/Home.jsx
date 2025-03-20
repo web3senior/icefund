@@ -465,7 +465,7 @@ function Home() {
           { key: `Contract`, value: `${lsp7.data.Asset[0].id}` },
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
-          { key: `Amount`, value: `${amountRef.current.value} $${lsp7.data.Asset[0].lsp4TokenSymbol}` },
+          { key: `Amount`, value: `${amountRef.current.value}` },
           { key: `Expiration`, value: `${moment.unix(moment(new Date()).add(periodRef.current.value, 'minutes').unix()).format('MM/DD/YYYY | H:m:s')}` },
         ],
         icon: [
