@@ -461,7 +461,7 @@ function Home() {
         description: `Unlock community rewards by freezing your LSP7 tokens.`,
         links: [{ title: 'Mini Dapp', url: 'https://profile.link/arattalabs@0D5C' }],
         attributes: [
-          { key: `LSP7`, value: `True` },
+          { key: `ASSET`, value: `True` },
           { key: `Token Id`, value: `${lsp7.data.Asset[0].id}` },
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
@@ -686,7 +686,7 @@ function Home() {
                     <animate id="animation2" attributeName="opacity" from="1" to="0" dur="1s" begin="animation1.end" />
                   </rect>
                   <g>
-                    <text ref={svgSymbolRef} x="50%" y="68%" dominantBaseline="middle" textAnchor="middle" fontWeight={`bold`} fontSize={`1.4rem`} fill={`#8091a7`}>
+                    <text ref={svgSymbolRef} x="50%" y="68%" dominantBaseline="middle" textAnchor="middle" fontWeight={`bold`} fontSize={`1rem`} fill={`#8091a7`}>
                       {lsp7.data.Asset[0].lsp4TokenSymbol}
                     </text>
                   </g>
