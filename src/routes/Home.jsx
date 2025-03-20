@@ -644,12 +644,12 @@ function Home() {
             </div>
           )} */}
 
-          <div className={`grid grid--fit grid--gap-1 ${styles['token']} w-100`} style={{ '--data-width': `60px` }}>
+          <div className={`grid grid--fit grid--gap-1 ${styles['token']} w-100`} style={{ '--data-width': `200px` }}>
             {token &&
               token.map((item, i) => {
                 console.log(item)
                 return (
-                  <div key={i} className={`card ${styles['card']}`} onClick={() => window.open(`https://universaleverything.io/asset/${import.meta.env.VITE_CONTRACT}/tokenId/${item.tokenId}`)}>
+                  <div key={i} className={`card ${styles['card']}`}>
                     <div className={`card__body ${styles['card__body']} d-f-c flex-column`}>
                       <Canvas tokenId={`${item.tokenId}`} imageUrl={`${import.meta.env.VITE_IPFS_GATEWAY}${item.LSP4Metadata.LSP4Metadata.images[0][0].url.replace('ipfs://', '').replace('://', '')}`} />
 
@@ -793,7 +793,7 @@ const Canvas = ({ tokenId, imageUrl }) => {
     img.src = `${imageUrl}`
   }, [])
 
-  return <canvas id={`canvas${tokenId}`} width="200" height="200" />
+  return <canvas id={`canvas${tokenId}`} width="200" height="200"  onClick={() => window.open(`https://universaleverything.io/asset/${import.meta.env.VITE_CONTRACT}/tokenId/${tokenId}`)}/>
 }
 
 export default Home
