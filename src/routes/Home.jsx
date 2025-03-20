@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, createElement } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { useUpProvider } from '../contexts/UpProvider'
 import { PinataSDK } from 'pinata'
@@ -650,7 +650,7 @@ function Home() {
                 return (
                   <div key={i} className={`card ${styles['card']}`}>
                     <div className={`card__body ${styles['card__body']} d-f-c flex-column`}>
-                      <Canvas imageUrl={`${import.meta.env.VITE_IPFS_GATEWAY}${item.LSP4Metadata.LSP4Metadata.images[0][0].url.replace('ipfs://', '').replace('://', '')}`} />
+                      <Canvas tokenId={`${item.tokenId}`} imageUrl={`${import.meta.env.VITE_IPFS_GATEWAY}${item.LSP4Metadata.LSP4Metadata.images[0][0].url.replace('ipfs://', '').replace('://', '')}`} />
 
                       <small className={`text-center d-f-c flex-column`}>
                         <p>
@@ -774,13 +774,13 @@ function Home() {
   )
 }
 
-const Canvas = ({ imageUrl }) => {
+const Canvas = ({ tokenId, imageUrl }) => {
   console.log(imageUrl)
   useEffect(() => {
-    var can = document.getElementById('canvas')
-    var ctx = can.getContext('2d')
+    const can = document.querySelector(`#canvas${tokenId}`)
+    const ctx = can.getContext('2d')
 
-    var img = new Image()
+    const img = new Image()
     img.onload = function () {
       ctx.drawImage(img, 0, 0, can.width, can.height)
     }
@@ -788,7 +788,7 @@ const Canvas = ({ imageUrl }) => {
     img.src = `${imageUrl}`
   }, [])
 
-  return <canvas id={`canvas`} width="200" height="200"></canvas>
+  return <canvas id={`canvas${tokenId}`} width="200" height="200" />
 }
 
 export default Home
