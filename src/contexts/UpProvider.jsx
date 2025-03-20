@@ -1,137 +1,184 @@
-/**
- * @component UpProvider
- * @description Context provider that manages Universal Profile (UP) wallet connections and state
- * for LUKSO blockchain interactions on Grid. It handles wallet connection status, account management, and chain
- * information while providing real-time updates through event listeners.
- *
- * @provides {UpProviderContext} Context containing:
- * - provider: UP-specific wallet provider instance
- * - client: Viem wallet client for blockchain interactions
- * - chainId: Current blockchain network ID
- * - accounts: Array of connected wallet addresses
- * - contextAccounts: Array of Universal Profile accounts
- * - walletConnected: Boolean indicating active wallet connection
- * - selectedAddress: Currently selected address for transactions
- * - isSearching: Loading state indicator
- */
 'use client'
 
+import React, { useContext, useEffect, useState, useCallback } from 'react'
+import ABI from './../abi/Dracos.json'
+import LSP0ERC725Account from '@lukso/lsp-smart-contracts/artifacts/LSP0ERC725Account.json'
+// import { toast } from '../components/NextToast'
+import { Loading } from './../routes/components/Loading'
+import toast from 'react-hot-toast'
+import Web3 from 'web3'
 import { createClientUPProvider } from '@lukso/up-provider'
-import { createWalletClient, custom } from 'viem'
-import { lukso, luksoTestnet } from 'viem/chains'
-import { createContext, useContext, useEffect, useState, useMemo } from 'react'
-import {Loading} from './../components/Loading'
 
-const UpContext = createContext(undefined)
+export const AuthContext = React.createContext()
+export const provider = createClientUPProvider()
+// export const PROVIDER = import.meta.env.NEXT_PUBLIC_RPC_URL
+export const web3 = new Web3(provider)
+export const contract = new web3.eth.Contract(ABI, import.meta.env.VITE_CONTRACT)
+export const _ = web3.utils
 
-const provider = typeof window !== 'undefined' ? createClientUPProvider() : null
-
-export function useUpProvider() {
-  const context = useContext(UpContext)
-  if (!context) {
-    throw new Error('useUpProvider must be used within a UpProvider')
-  }
-  return context
+export function useAuth() {
+  return useContext(AuthContext)
 }
 
-export function UpProvider({ children }) {
-  const [chainId, setChainId] = useState(0)
-  const [accounts, setAccounts] = useState([])
-  const [contextAccounts, setContextAccounts] = useState([])
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [selectedAddress, setSelectedAddress] = useState(null)
-  const [isSearching, setIsSearching] = useState(false)
+export const isAuth = async () => localStorage.getItem('accessToken')
+export const chainID = async () => await web3.eth.getChainId()
 
-  const client = useMemo(() => {
-    if (provider && chainId) {
-      return createWalletClient({
-        chain: chainId === 42 ? lukso : luksoTestnet,
-        transport: custom(provider),
+export const getIPFS = async (CID) => {
+  let requestOptions = {
+    method: 'GET',
+    redirect: 'follow',
+  }
+  const response = await fetch(`${import.meta.env.VITE_IPFS_GATEWAY}${CID}`, requestOptions)
+  if (!response.ok) return { result: false } //throw new Response('Failed to get data', { status: 500 })
+  return response.json()
+}
+
+/**
+ * Fetch Universal Profile
+ * @param {address} addr
+ * @returns
+ */
+
+export const fetchProfile = async (_addr) => {
+  const web3 = new Web3(provider)
+  const LSP0ERC725Contract = new web3.eth.Contract(LSP0ERC725Account.abi, _addr)
+  try {
+    return LSP0ERC725Contract.methods
+      .getData('0x5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5')
+      .call()
+      .then(async (data) => {
+        data = data.substring(6, data.length)
+        // console.log(data)
+        //  data ="0x" + data.substring(6)
+        //  console.log(data)
+        // slice the bytes to get its pieces
+        const hashFunction = '0x' + data.slice(0, 8)
+        // console.log(hashFunction)
+        const hash = '0x' + data.slice(76)
+        const url = '0x' + data.slice(76)
+        // console.log(hashFunction, ' | ', hash, ' | ', url)
+        // check if it uses keccak256
+        //  if (hashFunction === '0x6f357c6a') {
+        // download the json file
+        // console.log(`-------------`,web3.utils.hexToUtf8(url).replace('ipfs://', '').replace('://', ''))
+        const json = await getIPFS(web3.utils.hexToUtf8(url).replace('ipfs://', '').replace('://', ''))
+        return json
       })
+  } catch (error) {
+    console.log(`fetch profile error => `, error)
+    return []
+  }
+}
+
+export function AuthProvider({ children }) {
+  const [wallet, setWallet] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState()
+  const [balance, setBalance] = useState(0)
+
+  const [accounts, setAccounts] = useState([])
+  const [contextAccounts, setContextAccounts] = useState([]) //0x${string}
+  const [profileConnected, setProfileConnected] = useState(false)
+
+  const isWalletConnected = async () => {
+    try {
+      let accounts = await web3.eth.getAccounts()
+      return accounts[0]
+    } catch (error) {
+      toast.error(error.message)
     }
-    return null
-  }, [chainId])
+  }
+
+  const getBalance = async (wallet) => {
+    const balance = await web3.eth.getBalance(wallet)
+    return parseFloat(web3.utils.fromWei(balance, `ether`)).toFixed(2)
+  }
+
+  const connect = async () => {
+    let t = toast.loading('Loading...', `loading`)
+
+    try {
+      let accounts = await web3.eth.getAccounts()
+      if (accounts.length === 0) await web3.eth.requestAccounts()
+      accounts = await web3.eth.getAccounts()
+
+      getBalance(accounts[0]).then((balance) => setBalance(balance))
+      //console.log(accounts)
+      setWallet(accounts[0])
+      fetchProfile(accounts[0]).then((res) => {
+        console.log(res)
+        setProfile(res)
+      })
+
+      toast(`UP successfuly connected`, `success`)
+      toast.dismiss(t)
+      return accounts[0]
+    } catch (error) {
+      toast(`The provider could not be found.`, `error`)
+    }
+  }
+
+  // Helper to check connection status
+  const updateConnected = useCallback((_accounts, _contextAccounts) => {
+    setProfileConnected(_accounts.length > 0 && _contextAccounts.length > 0)
+  }, [])
 
   useEffect(() => {
-    let mounted = true
     async function init() {
       try {
-        if (!client || !provider) return
-
-        const _chainId = await provider.request('eth_chainId')
-        if (!mounted) return
-        setChainId(_chainId)
-
-        const _accounts = await provider.request('eth_accounts', [])
-        if (!mounted) return
+        const _accounts = provider.accounts
         setAccounts(_accounts)
 
         const _contextAccounts = provider.contextAccounts
-        if (!mounted) return
-        setContextAccounts(_contextAccounts)
-        setWalletConnected(_accounts.length > 0 && _contextAccounts.length > 0)
+        console.log(_contextAccounts)
+        updateConnected(_accounts, _contextAccounts)
       } catch (error) {
-        console.error(error)
+        console.error('Failed to initialize provider:', error)
       }
+    }
+
+    // Handle account changes
+    const accountsChanged = (_accounts) => {
+      setAccounts(_accounts)
+      updateConnected(_accounts, contextAccounts)
+    }
+
+    const contextAccountsChanged = (_accounts) => {
+      setContextAccounts(_accounts)
+      updateConnected(accounts, _accounts)
     }
 
     init()
 
-    if (provider) {
-      const accountsChanged = (_accounts) => {
-        setAccounts(_accounts)
-        setWalletConnected(_accounts.length > 0 && contextAccounts.length > 0)
-      }
+    // Set up event listeners
+    provider.on('accountsChanged', accountsChanged)
+    provider.on('contextAccountsChanged', contextAccountsChanged)
 
-      const contextAccountsChanged = (_accounts) => {
-        setContextAccounts(_accounts)
-        setWalletConnected(accounts.length > 0 && _accounts.length > 0)
-      }
-
-      const chainChanged = (_chainId) => {
-        setChainId(_chainId)
-      }
-
-      provider.on('accountsChanged', accountsChanged)
-      provider.on('chainChanged', chainChanged)
-      provider.on('contextAccountsChanged', contextAccountsChanged)
-
-      return () => {
-        mounted = false
-        provider.removeListener('accountsChanged', accountsChanged)
-        provider.removeListener('contextAccountsChanged', contextAccountsChanged)
-        provider.removeListener('chainChanged', chainChanged)
-      }
+    // Cleanup listeners
+    return () => {
+      provider.removeListener('accountsChanged', accountsChanged)
+      provider.removeListener('contextAccountsChanged', contextAccountsChanged)
     }
-    // If you want to be responsive to account changes
-    // you also need to look at the first account rather
-    // then the length or the whole array. Unfortunately react doesn't properly
-    // look at array values like vue or knockout.
-  }, [client, accounts[0], contextAccounts[0]])
+  }, [accounts[0], contextAccounts[0], updateConnected])
 
-  // There has to be a useMemo to make sure the context object doesn't change on every
-  // render.
-  const data = useMemo(() => {
-    return {
-      provider,
-      client,
-      chainId,
-      accounts,
-      contextAccounts,
-      walletConnected,
-      selectedAddress,
-      setSelectedAddress,
-      isSearching,
-      setIsSearching,
-    }
-  }, [client, chainId, accounts, contextAccounts, walletConnected, selectedAddress, isSearching])
+  const value = {
+    accounts,
+    contextAccounts,
+    profileConnected,
+    status,
+    loading,
+    wallet,
+    balance,
+    setWallet,
+    profile,
+    getIPFS,
+    fetchProfile,
+    setProfile,
+    isWalletConnected,
+    connect,
+  }
 
-  // fill contextAccount
-  if (contextAccounts.length === 0) return <Loading/>
-
-  return (
-    <UpContext.Provider value={data}>
-      <div className="min-h-screen flex items-center justify-center">{children}</div>
-    </UpContext.Provider>
-  )
+  //if (!profileConnected) return <Loading />
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
