@@ -648,7 +648,7 @@ function Home() {
               token.map((item, i) => {
                 console.log(item)
                 return (
-                  <div key={i} className={`card ${styles['card']}`} onClick={() => window.open(`https://universaleverything.io/asset/0x035adaca35bd05b7ee02bb4630663afc410c13f2/tokenId/${item.tokenId}`)}>
+                  <div key={i} className={`card ${styles['card']}`} onClick={() => window.open(`https://universaleverything.io/asset/${import.meta.env.VITE_CONTRACT}/tokenId/${item.tokenId}`)}>
                     <div className={`card__body ${styles['card__body']} d-f-c flex-column`}>
                       <Canvas tokenId={`${item.tokenId}`} imageUrl={`${import.meta.env.VITE_IPFS_GATEWAY}${item.LSP4Metadata.LSP4Metadata.images[0][0].url.replace('ipfs://', '').replace('://', '')}`} />
 
