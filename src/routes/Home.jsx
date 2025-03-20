@@ -793,7 +793,7 @@ const Canvas = ({ tokenId, imageUrl }) => {
     img.src = `${imageUrl}`
   }, [])
 
-  return <canvas id={`canvas${tokenId}`} width="200" height="200"  onClick={() => window.open(`https://universaleverything.io/asset/${import.meta.env.VITE_CONTRACT}/tokenId/${tokenId}`)}/>
+  return <canvas style={{ cursor: `pointer` }} id={`canvas${tokenId}`} width="200" height="200" onClick={() => window.open(`https://universaleverything.io/asset/${import.meta.env.VITE_CONTRACT}/tokenId/${tokenId}`)} />
 }
 
 export default Home
