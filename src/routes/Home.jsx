@@ -423,8 +423,8 @@ function Home() {
         const base64data = reader.result
         const image = document.createElementNS(svgns, 'image')
         image.setAttribute('href', base64data)
-        image.setAttribute('width', 130)
-        image.setAttribute('height', 130)
+        image.setAttribute('width', 120)
+        image.setAttribute('height', 120)
         image.setAttribute('transform', `translate(-25,-25)`)
         image.setAttribute('x', 107)
         image.setAttribute('y', 90)
@@ -455,6 +455,8 @@ function Home() {
 
     const t = toast.loading(`Waiting for transaction's confirmation`)
 
+    const period = periodRef.current.value * 1440 // In days: convert to minutes
+
     const metadata = JSON.stringify({
       LSP4Metadata: {
         name: 'ICEFUND',
@@ -466,8 +468,8 @@ function Home() {
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
           { key: `Amount`, value: `${amountRef.current.value}` },
-          { key: `Time Lock`, value: `${periodRef.current.value}` },
-          { key: `Expiration`, value: `${moment.unix(moment(new Date()).add(periodRef.current.value, 'minutes').unix()).format('MM/DD/YYYY | H:m:s')}` },
+          { key: `Time Lock`, value: `${period}` },
+          { key: `Expiration`, value: `${moment.unix(moment(new Date()).add(period, 'minutes').unix()).format('MM/DD/YYYY | H:m:s')}` },
         ],
         icon: [
           {
@@ -518,10 +520,9 @@ function Home() {
             toast.success(`Approved, now sign the tx`)
             toast.dismiss(t)
 
-            console.log((token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata))
             // Sign
             contract.methods
-              .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata)
+              .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), period, metadata)
               .send({
                 from: auth.accounts[0],
                 value: 0,
@@ -711,7 +712,7 @@ function Home() {
                   <input ref={amountRef} type="text" name="" id="" placeholder={`Amount`} />
                 </li>
                 <li>
-                  <input ref={periodRef} type="text" name="" id="" placeholder={`Period in minutes`} />
+                  <input ref={periodRef} type="text" name="" id="" placeholder={`Period in days`} />
                 </li>
                 <li>
                   <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
