@@ -461,7 +461,7 @@ function Home() {
         description: `Unlock community rewards by freezing your LSP7 tokens.`,
         links: [{ title: 'Mini Dapp', url: 'https://profile.link/arattalabs@0D5C' }],
         attributes: [
-          { key: `ASSET`, value: `True` },
+          { key: `ASSET`, value: `LSP7` },
           { key: `Contract`, value: `${lsp7.data.Asset[0].id}` },
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
