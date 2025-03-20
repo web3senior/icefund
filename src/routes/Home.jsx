@@ -28,6 +28,7 @@ function Home() {
   const [lockModal, setLockModal] = useState(false)
   const [caveModal, setCaveModal] = useState(false)
   const [previewNFT, setPreviewNFT] = useState(false)
+  const [isIconLoaded, setIsIconLoaded] = useState(false)
   const [lsp7list, setLsp7list] = useState([])
   const [lsp7, setLsp7] = useState()
 
@@ -431,6 +432,8 @@ function Home() {
 
         iconRef.current.innerHTML = ''
         iconRef.current.appendChild(image)
+
+        setIsIconLoaded(true)
       }
 
       // Add symbol of token
@@ -447,6 +450,7 @@ function Home() {
 
     const uploadResult = await upload()
     console.log(`uploadResult => `, uploadResult)
+
     const verifiableUrl = await rAsset(uploadResult[1])
 
     const t = toast.loading(`Waiting for transaction's confirmation`)
@@ -458,11 +462,11 @@ function Home() {
         links: [{ title: 'Mini Dapp', url: 'https://profile.link/arattalabs@0D5C' }],
         attributes: [
           { key: `LSP7`, value: `True` },
-          { key: `Token`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
+          { key: `Token Id`, value: `${lsp7.data.Asset[0].id}` },
+          { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
           { key: `Amount`, value: `${amountRef.current.value} $${lsp7.data.Asset[0].lsp4TokenSymbol}` },
-          { key: `Period`, value: `${periodRef.current.value} Days` },
-          { key: `Expire`, value: `${moment.unix(moment(new Date()).add(periodRef.current.value, 'days').utc().unix()).format('MM/DD/YYYY')} UTC` },
+          { key: `Expiration`, value: `${moment.unix(moment(new Date()).add(periodRef.current.value, 'minutes').unix()).format('MM/DD/YYYY | H:m:s')}` },
         ],
         icon: [
           {
@@ -575,7 +579,7 @@ function Home() {
     try {
       // Sign
       contract.methods
-        .unlock(tokenId)
+        .unLock(tokenId)
         .send({
           from: auth.accounts[0],
           value: 0,
@@ -600,7 +604,7 @@ function Home() {
   useEffect(() => {
     console.clear()
 
-  contractReadonly.methods._lockCounter().call().then(console.log)
+    contractReadonly.methods._lockCounter().call().then(console.log)
 
     //getDataForTokenId().then(console.log)
 
@@ -619,7 +623,7 @@ function Home() {
           {profile && profile.data.search_profiles.length > 0 && (
             <figure className={`d-f-c flex-column`}>
               <img
-                src={`${profile.data.search_profiles[0].profileImages.length > 0 ? profile.data.search_profiles[0].profileImages[0].src : 'https://ipfs.io/ipfs/bafkreihdpxu5e77tfkekpq24wtu4pplhdw3ssdvuwatexs42hyxeh3enei'}`}
+                src={`${profile.data.search_profiles[0].profileImages.length > 0 ? profile.data.search_profiles[0].profileImages[0].src : 'https://ipfs.io/ipfs/bafkreic3rlqhhyu5ruska7dwpdlw7qjy5r3hnxd2yhshpbwz56uargz27u'}`}
                 className={`rounded`}
                 style={{ height: `64px` }}
                 alt=""
@@ -639,7 +643,7 @@ function Home() {
             </div>
           )} */}
 
-          <div className={`grid grid--fit grid--gap-1 ${styles['token']}`} style={{ '--data-width': `60px` }}>
+          <div className={`grid grid--fit grid--gap-1 ${styles['token']} w-100`} style={{ '--data-width': `60px` }}>
             {token &&
               token.map((item, i) => {
                 console.log(item)
@@ -655,6 +659,8 @@ function Home() {
                           <b className={`text-danger ml-10`}>${item.lsp7Data.data.Asset[0].lsp4TokenSymbol}</b>
                         </p>
                         <b>Expiration: {moment.unix(web3Readonly.utils.toNumber(item.expiration)).utc().fromNow()}</b>
+
+                        <b>Status: {item.isLocked === true ? `🔴Locked` : `🟢UnLocked`}</b>
                       </small>
 
                       <button onClick={(e) => handleUnLock(e, item.tokenId)}>Unlock</button>
@@ -700,10 +706,12 @@ function Home() {
                   <input ref={amountRef} type="text" name="" id="" placeholder={`Amount`} />
                 </li>
                 <li>
-                  <input ref={periodRef} type="text" name="" id="" placeholder={`Period`} />
+                  <input ref={periodRef} type="text" name="" id="" placeholder={`Period in minutes`} />
                 </li>
                 <li>
-                  <button onClick={(e) => handleMint(e)}>Approve & lock</button>
+                  <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
+                    Approve & lock
+                  </button>
                   <button
                     className="mt-10"
                     onClick={() => {
@@ -751,7 +759,12 @@ function Home() {
           {!lockModal && !token && (
             <>
               <div className={`d-f-c grid--gap-1`}>
-          
+                <button onClick={() => setLockModal(true)} disabled={!auth.walletConnected}>
+                  Lock
+                </button>
+                <button onClick={() => showCave()} disabled={!auth.walletConnected}>
+                  My Cave
+                </button>
               </div>
             </>
           )}

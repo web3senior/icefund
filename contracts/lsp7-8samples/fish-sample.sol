@@ -13,7 +13,7 @@ import "./_error.sol";
 /// @dev You will find the deployed contract addresses on the official website
 /// @custom:emoji 🦭
 /// @custom:security-contact atenyun@gmail.com
-contract LSP7 is LSP7Mintable, LSP7Burnable {
+contract Fish is LSP7Mintable, LSP7Burnable {
     uint256 public constant tokenSupplyCap = 500_000_000 ether;
 
     constructor() LSP7Mintable("Fish", "FISH", msg.sender, _LSP4_TOKEN_TYPE_TOKEN, false) {

@@ -1271,7 +1271,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"lsp8tokensample/fish-sample.sol": "Fish"
+			"lsp7-8samples/fish-sample.sol": "Fish"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -1279,7 +1279,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": false,
+			"enabled": true,
 			"runs": 200
 		},
 		"remappings": []
@@ -1533,7 +1533,7 @@
 				"dweb:/ipfs/QmSYuH1AhvJkPK8hNvoPqtExBcgTB42pPRHgTHkS5c5zYW"
 			]
 		},
-		"lsp8tokensample/_error.sol": {
+		"lsp7-8samples/_error.sol": {
 			"keccak256": "0x0ff53ad6097ff966df2873d1b48e094d5051b2e6c8a16bf081c42da0fe34b3e2",
 			"license": "MIT",
 			"urls": [
@@ -1541,7 +1541,7 @@
 				"dweb:/ipfs/QmQCdvE6kDokcBsykEt9JAy8wMvjmiPeaguBg6CskXf4PD"
 			]
 		},
-		"lsp8tokensample/fish-sample.sol": {
+		"lsp7-8samples/fish-sample.sol": {
 			"keccak256": "0x018757c963a12bfc4da8d117f0f57cca5a485701923efd2b4a1cab1ace563028",
 			"license": "Apache-2.0",
 			"urls": [

@@ -19,11 +19,12 @@ import "./Error.sol";
 /// @dev Deployed contract addresses are available in the project repository.
 /// @custom:emoji 🧊
 /// @custom:security-contact atenyun@gmail.com
-contract IceFund is LSP8IdentifiableDigitalAsset("ICEFUND", "ICF", msg.sender, _LSP4_TOKEN_TYPE_COLLECTION, _LSP4_TOKEN_TYPE_TOKEN), Pausable {
+contract IceFund is LSP8IdentifiableDigitalAsset("ICEFUND", "ICE", msg.sender, _LSP4_TOKEN_TYPE_COLLECTION, _LSP4_TOKEN_TYPE_TOKEN), Pausable {
     using Counters for Counters.Counter;
     Counters.Counter public _lockCounter;
 
     uint8 public fee;
+    string public constant VERSION = "2.0.0";
     string failedMessage = "Failed to send Ether!";
 
     struct LockStruct {
@@ -32,6 +33,7 @@ contract IceFund is LSP8IdentifiableDigitalAsset("ICEFUND", "ICF", msg.sender, _
         uint256 amount;
         uint256 expiration;
         uint256 dt;
+        bool isLocked;
     }
 
     mapping(address => LockStruct[]) public lockPool;
@@ -57,7 +59,7 @@ contract IceFund is LSP8IdentifiableDigitalAsset("ICEFUND", "ICF", msg.sender, _
         return verfiableURI;
     }
 
-    ///@notice Luck
+    ///@notice Lock
     function lock(
         address token,
         uint256 amount,
@@ -87,70 +89,47 @@ contract IceFund is LSP8IdentifiableDigitalAsset("ICEFUND", "ICF", msg.sender, _
         // Set data
         _setDataForTokenId(tokenId, _LSP4_METADATA_KEY, getMetadata(metadata));
 
-        lockPool[_msgSender()].push(LockStruct(bytes32(_lockCounter.current()), token, amount, (expiration * 1 days) + block.timestamp, block.timestamp));
+        uint256 expireIn = ((expiration * 1 minutes) + block.timestamp);
 
-        // Log
-        emit Locked(token, amount, (expiration * 1 days) + block.timestamp, _msgSender(), block.timestamp);
+        lockPool[_msgSender()].push(LockStruct(bytes32(_lockCounter.current()), token, amount, expireIn, block.timestamp, true));
+
+        emit Locked(token, amount, expireIn, _msgSender(), block.timestamp, true);
+
         return true;
     }
 
-    /// @notice Unlock
-    ///@param tokenId Token Id in bytes32
+    ///@notice Unlock
+    ///@param tokenId Token Id
     ///@return bool
-    function unlock(bytes32 tokenId) public whenNotPaused returns (bool) {
+    function unLock(bytes32 tokenId) public returns (bool) {
         // Check if sender is the owner of the token
         if (tokenOwnerOf(tokenId) != _msgSender()) revert Unauthorized();
 
-        bool found = false;
         for (uint256 i = 0; i < lockPool[_msgSender()].length; i++) {
-            if (lockPool[_msgSender()][i].tokenId == tokenId) {
-                found = true;
-                require(lockPool[_msgSender()][i].expiration < block.timestamp, "Too early");
-                _burn(tokenId, "");
+            if (lockPool[_msgSender()][i].tokenId == tokenId && lockPool[_msgSender()][i].isLocked == true) {
+                require(lockPool[_msgSender()][i].expiration < block.timestamp, "Too Early");
+
+                // Transfer the token
                 ILSP7(lockPool[_msgSender()][i].token).transfer(address(this), _msgSender(), lockPool[_msgSender()][i].amount, true, "");
 
-                // remove
-                if (lockPool[_msgSender()].length > i + 1) lockPool[_msgSender()][i] = lockPool[_msgSender()][i + 1];
+                // Make the status false => unlocked
+                lockPool[_msgSender()][i].isLocked = false;
 
-                // Decrement counter
-                _lockCounter.decrement();
+                emit UnLocked(lockPool[_msgSender()][i].token, lockPool[_msgSender()][i].amount, lockPool[_msgSender()][i].expiration, _msgSender(), block.timestamp, false);
 
-                emit UnLocked(lockPool[_msgSender()][i].token, lockPool[_msgSender()][i].amount, lockPool[_msgSender()][i].expiration, _msgSender(), block.timestamp);
+                return true;
             }
         }
 
-        if (found) lockPool[_msgSender()].pop();
-
-        return true;
+        return false;
     }
 
     function lsp7AuthorizedAmountFor(address token) public view returns (uint256) {
         return ILSP7(token).authorizedAmountFor(address(this), msg.sender);
     }
 
-    function lsp7Balance(address token) public view onlyOwner returns (uint256) {
+    function lsp7Balance(address token) public view returns (uint256) {
         return ILSP7(token).balanceOf(address(this));
-    }
-
-    ///@notice calcPercentage percentage
-    ///@param _amount The total amount
-    ///@param _bps The precentage
-    ///@return percentage %
-    function calcPercentage(uint256 _amount, uint256 _bps) public pure returns (uint256) {
-        if (_bps == 0) return 0;
-        require((_amount * _bps) >= 100);
-        return (_amount * _bps) / 100;
-    }
-
-    ///@notice Withdraw LSP7 token
-    function withdrawToken(
-        address _token,
-        address _to,
-        uint256 _amount,
-        bool _force,
-        bytes memory _data
-    ) public onlyOwner {
-        ILSP7(_token).transfer(address(this), _to, _amount, _force, _data);
     }
 
     ///@notice Withdraw the balance from this contract to the owner's address

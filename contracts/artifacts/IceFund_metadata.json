@@ -401,6 +401,12 @@
 						"internalType": "uint256",
 						"name": "dt",
 						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "bool",
+						"name": "status",
+						"type": "bool"
 					}
 				],
 				"name": "Locked",
@@ -606,6 +612,12 @@
 						"internalType": "uint256",
 						"name": "dt",
 						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "bool",
+						"name": "status",
+						"type": "bool"
 					}
 				],
 				"name": "UnLocked",
@@ -627,6 +639,19 @@
 			{
 				"stateMutability": "payable",
 				"type": "fallback"
+			},
+			{
+				"inputs": [],
+				"name": "VERSION",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
 			},
 			{
 				"inputs": [],
@@ -700,30 +725,6 @@
 					}
 				],
 				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_amount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_bps",
-						"type": "uint256"
-					}
-				],
-				"name": "calcPercentage",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "pure",
 				"type": "function"
 			},
 			{
@@ -879,6 +880,11 @@
 								"internalType": "uint256",
 								"name": "dt",
 								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "isLocked",
+								"type": "bool"
 							}
 						],
 						"internalType": "struct IceFund.LockStruct[]",
@@ -1037,6 +1043,11 @@
 						"internalType": "uint256",
 						"name": "dt",
 						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isLocked",
+						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -1405,7 +1416,7 @@
 						"type": "bytes32"
 					}
 				],
-				"name": "unlock",
+				"name": "unLock",
 				"outputs": [
 					{
 						"internalType": "bool",
@@ -1439,39 +1450,6 @@
 			{
 				"inputs": [],
 				"name": "withdraw",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_token",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "_to",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_amount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "bool",
-						"name": "_force",
-						"type": "bool"
-					},
-					{
-						"internalType": "bytes",
-						"name": "_data",
-						"type": "bytes"
-					}
-				],
-				"name": "withdrawToken",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -1733,15 +1711,6 @@
 						"results": "An array of abi-encoded data returned by the functions executed."
 					}
 				},
-				"calcPercentage(uint256,uint256)": {
-					"params": {
-						"_amount": "The total amount",
-						"_bps": "The precentage"
-					},
-					"returns": {
-						"_0": "percentage %"
-					}
-				},
 				"getData(bytes32)": {
 					"details": "Get in the ERC725Y storage the bytes data stored at a specific data key `dataKey`.",
 					"params": {
@@ -1899,9 +1868,9 @@
 				"transferOwnership(address)": {
 					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
 				},
-				"unlock(bytes32)": {
+				"unLock(bytes32)": {
 					"params": {
-						"tokenId": "Token Id in bytes32"
+						"tokenId": "Token Id"
 					},
 					"returns": {
 						"_0": "bool"
@@ -1940,9 +1909,6 @@
 				"batchCalls(bytes[])": {
 					"notice": "Executing the following batch of abi-encoded function calls on the contract: `data`."
 				},
-				"calcPercentage(uint256,uint256)": {
-					"notice": "calcPercentage percentage"
-				},
 				"getBalance()": {
 					"notice": "Return the balance of this contract"
 				},
@@ -1962,7 +1928,7 @@
 					"notice": "Create verifiable metadata for the LSP8 standard"
 				},
 				"lock(address,uint256,uint256,string)": {
-					"notice": "Luck"
+					"notice": "Lock"
 				},
 				"pause()": {
 					"notice": "Pause mint"
@@ -1982,7 +1948,7 @@
 				"transferBalance(address,uint256)": {
 					"notice": "Transfer balance from this contract to input address"
 				},
-				"unlock(bytes32)": {
+				"unLock(bytes32)": {
 					"notice": "Unlock"
 				},
 				"unpause()": {
@@ -1993,9 +1959,6 @@
 				},
 				"withdraw()": {
 					"notice": "Withdraw the balance from this contract to the owner's address"
-				},
-				"withdrawToken(address,address,uint256,bool,bytes)": {
-					"notice": "Withdraw LSP7 token"
 				}
 			},
 			"notice": "A contract for managing the IceFund, enabling locking LSP7, and minting dynamic NFT.",
@@ -2315,19 +2278,19 @@
 			]
 		},
 		"Event.sol": {
-			"keccak256": "0xbac9dbbd97ad714093feac859d6ac6ea0c9d0e8217dba7a7f782bb6e1c6943a2",
+			"keccak256": "0x491838839c2b2691442534089d82090fd280fcbe6d8adf2daeccaa1d3a96e99d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e47b2294788e2860d46a3d0d60b042579115696337641b39420885f3b25e01af",
-				"dweb:/ipfs/QmYjMBm3fTPdK7DuJ6b6UKFvkJUbVMzpaAknHXqbbgwUEP"
+				"bzz-raw://0a0e5f3c8ead6bc6f42ebfa54de060abc75f8126f05f933993b106fc04fecc0c",
+				"dweb:/ipfs/QmTjvXaE9pSASiHCFs69Yyb11GkD92PLcBRTSA1YNZXh79"
 			]
 		},
 		"IceFund.sol": {
-			"keccak256": "0xe5d081e8c4910b377aef8c61f226b58fe48e6d96b767694a47ad985c8eb536e6",
+			"keccak256": "0x58818324630a621d441f26e90a8514015aa6ce2ca66eb63d8b35d9148f451234",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://638746953249575d445af9d987c40a4aa03b1b30eea830a71acfeddd1c9148a8",
-				"dweb:/ipfs/Qme6BvUQeZ4rgtRfmmEt18EKbpTadQsMof1eEKNawncscU"
+				"bzz-raw://ad577967b0c62c21c53b02fe40752556fd70e8a9dc808b57eed02cc924f191d7",
+				"dweb:/ipfs/QmSJtuSUZeU9m5Be9kpvsnST6jeN9M4oeMKzv8gPZF7nqn"
 			]
 		},
 		"Ownable.sol": {

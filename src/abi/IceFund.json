@@ -471,6 +471,12 @@
 				"internalType": "uint256",
 				"name": "dt",
 				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "bool",
+				"name": "status",
+				"type": "bool"
 			}
 		],
 		"name": "Locked",
@@ -897,6 +903,12 @@
 				"internalType": "uint256",
 				"name": "dt",
 				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "bool",
+				"name": "status",
+				"type": "bool"
 			}
 		],
 		"name": "UnLocked",
@@ -927,7 +939,7 @@
 				"type": "bytes32"
 			}
 		],
-		"name": "unlock",
+		"name": "unLock",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -966,39 +978,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_token",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "_force",
-				"type": "bool"
-			},
-			{
-				"internalType": "bytes",
-				"name": "_data",
-				"type": "bytes"
-			}
-		],
-		"name": "withdrawToken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"stateMutability": "payable",
 		"type": "receive"
 	},
@@ -1032,30 +1011,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_bps",
-				"type": "uint256"
-			}
-		],
-		"name": "calcPercentage",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
@@ -1211,6 +1166,11 @@
 						"internalType": "uint256",
 						"name": "dt",
 						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isLocked",
+						"type": "bool"
 					}
 				],
 				"internalType": "struct IceFund.LockStruct[]",
@@ -1335,6 +1295,11 @@
 				"internalType": "uint256",
 				"name": "dt",
 				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isLocked",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -1469,6 +1434,19 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "VERSION",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
