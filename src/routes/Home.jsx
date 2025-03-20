@@ -462,7 +462,7 @@ function Home() {
         links: [{ title: 'Mini Dapp', url: 'https://profile.link/arattalabs@0D5C' }],
         attributes: [
           { key: `ASSET`, value: `True` },
-          { key: `Token Id`, value: `${lsp7.data.Asset[0].id}` },
+          { key: `Contract`, value: `${lsp7.data.Asset[0].id}` },
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
           { key: `Amount`, value: `${amountRef.current.value} $${lsp7.data.Asset[0].lsp4TokenSymbol}` },
