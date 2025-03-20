@@ -468,7 +468,7 @@ function Home() {
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
           { key: `Amount`, value: `${amountRef.current.value}` },
-          { key: `Time Lock`, value: `${period}` },
+          { key: `Time Lock`, value: `${periodRef.current.value} days` },
           { key: `Expiration`, value: `${moment.unix(moment(new Date()).add(period, 'minutes').unix()).format('MM/DD/YYYY | H:m:s')}` },
         ],
         icon: [
@@ -712,7 +712,7 @@ function Home() {
                   <input ref={amountRef} type="text" name="" id="" placeholder={`Amount`} />
                 </li>
                 <li>
-                  <input ref={periodRef} type="text" name="" id="" placeholder={`Period in days`} />
+                  <input ref={periodRef} type={`number`} step={1} name="" id="" placeholder={`Period in days`} />
                 </li>
                 <li>
                   <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
