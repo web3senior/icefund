@@ -179,6 +179,6 @@ export function AuthProvider({ children }) {
     connect,
   }
 
-  if (!profileConnected) return <Loading />
+  // if (!profileConnected) return <Loading />
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
