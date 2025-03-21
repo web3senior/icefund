@@ -15,7 +15,7 @@ export const web3 = new Web3(provider)
 export const contract = new web3.eth.Contract(ABI, import.meta.env.VITE_CONTRACT)
 export const _ = web3.utils
 
-export function useAuth() {
+export function useUpProvider() {
   return useContext(AuthContext)
 }
 

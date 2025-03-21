@@ -1,7 +1,7 @@
 import React, { StrictMode, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
-import { UpProvider } from './contexts/UpProvider.jsx'
+import { AuthProvider } from './contexts/UpProvider.jsx'
 import './index.scss'
 import './styles/global.scss'
 
@@ -19,9 +19,9 @@ createRoot(root).render(
       <Route
         index
         element={
-          <UpProvider>
+          <AuthProvider>
             <Home />
-          </UpProvider>
+          </AuthProvider>
         }
       />
       <Route path="admin" element={<Admin />} />
