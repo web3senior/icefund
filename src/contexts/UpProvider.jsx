@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState, useCallback } from 'react'
 import ABI from './../abi/IceFund.json'
 import LSP0ERC725Account from '@lukso/lsp-smart-contracts/artifacts/LSP0ERC725Account.json'
 // import { toast } from '../components/NextToast'
+import { Loading } from './../routes/components/Loading'
 import toast from 'react-hot-toast'
 import Web3 from 'web3'
 import { createClientUPProvider } from '@lukso/up-provider'
@@ -178,6 +179,6 @@ export function AuthProvider({ children }) {
     connect,
   }
 
-  //if (!profileConnected) return <Loading />
+  if (!profileConnected) return <Loading />
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
