@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useContext, useEffect, useState, useCallback } from 'react'
-import ABI from './../abi/Dracos.json'
+import ABI from './../abi/IceFund.json'
 import LSP0ERC725Account from '@lukso/lsp-smart-contracts/artifacts/LSP0ERC725Account.json'
 // import { toast } from '../components/NextToast'
 import { Loading } from './../routes/components/Loading'
