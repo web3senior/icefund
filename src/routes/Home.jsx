@@ -466,9 +466,11 @@ function Home() {
     const t = toast.loading(`Waiting for transaction's confirmation`)
 
     const amount = lsp7.data.Asset[0].decimals === 0 ? amountRef.current.value : web3Readonly.utils.toWei(amountRef.current.value, `ether`)
-    const amountTrait = amountRef.current.value
+    const amountTrait = new Intl.NumberFormat( { maximumSignificantDigits: 3 }).format(amountRef.current.value)
     const period = periodRef.current.value * 1440 // In days: convert to minutes
-console.log(amountTrait)
+    
+    console.log(amountTrait)
+
     const metadata = JSON.stringify({
       LSP4Metadata: {
         name: 'ICEFUND',
@@ -516,7 +518,6 @@ console.log(amountTrait)
 
     const token = lsp7.data.Asset[0].id
     console.log(token)
-
 
     try {
       const web3 = new Web3(auth.provider)
