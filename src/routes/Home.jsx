@@ -714,7 +714,7 @@ function Home() {
 
               <ul className={`d-flex flex-column grid--gap-025`}>
                 <li>
-                  <input ref={amountRef} type="text" name="" id="" placeholder={`Amount`} />
+                  <input ref={amountRef} type={`number`} step={1} name="" id="" placeholder={`Amount`} />
                 </li>
                 <li>
                   <input ref={periodRef} type={`number`} step={1} name="" id="" placeholder={`Period in days`} />
