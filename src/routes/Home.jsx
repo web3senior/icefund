@@ -551,7 +551,7 @@ function Home() {
           })
       } else {
         contract.methods
-          .lock(token, amount, periodRef.current.value, metadata)
+          .lock(token, amount, period, metadata)
           .send({
             from: auth.accounts[0],
             value: 0,
@@ -656,6 +656,7 @@ function Home() {
             {token &&
               token.map((item, i) => {
                 console.log(item)
+                const amount = item.lsp7Data.data.Asset[0].decimals === 0 ? web3Readonly.utils.toNumber(item.amount) : web3Readonly.utils.fromWei(web3Readonly.utils.toNumber(item.amount), `ether`)
                 return (
                   <div key={i} className={`card ${styles['card']}`}>
                     <div className={`card__body ${styles['card__body']} d-f-c flex-column`}>
@@ -664,8 +665,8 @@ function Home() {
                       <small className={`text-center d-f-c flex-column`}>
                         <p>
                           <b>Amount: </b>
-                          <b className={`text-nowrap text-truncate`}>{web3Readonly.utils.fromWei(item.amount, `ether`)}</b>
-                          <b className={`text-danger ml-10`}>${item.lsp7Data.data.Asset[0].lsp4TokenSymbol}</b>
+                          <b className={`text-nowrap text-truncate`}>{amount}</b>
+                          <b className={`text-warning ml-10`}>${item.lsp7Data.data.Asset[0].lsp4TokenSymbol}</b>
                         </p>
                         <b>Expiration: {moment.unix(web3Readonly.utils.toNumber(item.expiration)).utc().fromNow()}</b>
 
