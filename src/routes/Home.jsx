@@ -676,7 +676,7 @@ function Home() {
                       <small className={`text-center d-f-c flex-column`}>
                         <p>
                           <b>Amount: </b>
-                          <b className={`text-nowrap text-truncate`}>{amount}</b>
+                          <b className={`text-nowrap text-truncate`}>{ new Intl.NumberFormat( { maximumSignificantDigits: 3 }).format(amount)}</b>
                           <b className={`text-warning ml-10`}>${item.lsp7Data.data.Asset[0].lsp4TokenSymbol}</b>
                         </p>
                         <b>Expiration: {moment.unix(web3Readonly.utils.toNumber(item.expiration)).utc().fromNow()}</b>
