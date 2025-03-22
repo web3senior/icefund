@@ -352,6 +352,7 @@ function Home() {
     name
     totalSupply
     owner_id
+    decimals
     icons {
       id
       src
@@ -505,6 +506,8 @@ function Home() {
     const token = lsp7.data.Asset[0].id
     console.log(token)
 
+    const amount = lsp7.data.Asset[0].decimals === 0 ? amountRef.current.value : web3Readonly.utils.toWei(amountRef.current.value, `ether`)
+
     try {
       const web3 = new Web3(auth.provider)
       const lsp7Contract = new web3.eth.Contract(ABILSP7, token)
@@ -516,7 +519,7 @@ function Home() {
         console.log(`Needs to approve token`)
 
         lsp7Contract.methods
-          .authorizeOperator(import.meta.env.VITE_CONTRACT, web3.utils.toWei(amountRef.current.value, `ether`), '0x')
+          .authorizeOperator(import.meta.env.VITE_CONTRACT, amount, '0x')
           .send({ from: auth.accounts[0] })
           .then((res) => {
             console.log(res)
@@ -525,7 +528,7 @@ function Home() {
 
             // Sign
             contract.methods
-              .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), period, metadata)
+              .lock(token, amount, period, metadata)
               .send({
                 from: auth.accounts[0],
                 value: 0,
@@ -547,9 +550,8 @@ function Home() {
             toast.dismiss(t)
           })
       } else {
-
         contract.methods
-          .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata)
+          .lock(token, amount, periodRef.current.value, metadata)
           .send({
             from: auth.accounts[0],
             value: 0,
@@ -609,7 +611,7 @@ function Home() {
   useEffect(() => {
     console.clear()
 
-    console.log(web3Readonly.utils.toWei('100',`ether`))
+    console.log(web3Readonly.utils.toWei('100', `ether`))
 
     contractReadonly.methods._lockCounter().call().then(console.log)
 
@@ -720,7 +722,7 @@ function Home() {
                   <input ref={periodRef} type={`number`} step={1} name="" id="" placeholder={`Period in days`} />
                 </li>
                 <li>
-                  <button >
+                  <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
                     Approve & lock
                   </button>
                   <button
