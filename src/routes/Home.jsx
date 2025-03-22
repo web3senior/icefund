@@ -456,6 +456,7 @@ function Home() {
 
     const t = toast.loading(`Waiting for transaction's confirmation`)
 
+    const amount = lsp7.data.Asset[0].decimals === 0 ? amountRef.current.value : web3Readonly.utils.toWei(amountRef.current.value, `ether`)
     const period = periodRef.current.value * 1440 // In days: convert to minutes
 
     const metadata = JSON.stringify({
@@ -468,7 +469,7 @@ function Home() {
           { key: `Contract`, value: `${lsp7.data.Asset[0].id}` },
           { key: `Token Name`, value: `${lsp7.data.Asset[0].lsp4TokenName}` },
           { key: `Symbol`, value: `$${lsp7.data.Asset[0].lsp4TokenSymbol}` },
-          { key: `Amount`, value: `${amountRef.current.value}` },
+          { key: `Amount`, value: `${amount}` },
           { key: `Time Lock`, value: `${periodRef.current.value} days` },
           { key: `Expiration`, value: `${moment.unix(moment(new Date()).add(period, 'minutes').unix()).format('MM/DD/YYYY | H:m:s')}` },
         ],
@@ -506,7 +507,6 @@ function Home() {
     const token = lsp7.data.Asset[0].id
     console.log(token)
 
-    const amount = lsp7.data.Asset[0].decimals === 0 ? amountRef.current.value : web3Readonly.utils.toWei(amountRef.current.value, `ether`)
 
     try {
       const web3 = new Web3(auth.provider)
