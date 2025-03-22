@@ -609,7 +609,7 @@ function Home() {
   useEffect(() => {
     console.clear()
 
-    console.log(web3Readonly.utils.toWei('0.00000000000000001',`ether`))
+    console.log(web3Readonly.utils.toWei('100',`ether`))
 
     contractReadonly.methods._lockCounter().call().then(console.log)
 
@@ -720,7 +720,7 @@ function Home() {
                   <input ref={periodRef} type={`number`} step={1} name="" id="" placeholder={`Period in days`} />
                 </li>
                 <li>
-                  <button >
+                  <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
                     Approve & lock
                   </button>
                   <button
