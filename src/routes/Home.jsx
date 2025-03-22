@@ -720,7 +720,7 @@ function Home() {
                   <input ref={periodRef} type={`number`} step={1} name="" id="" placeholder={`Period in days`} />
                 </li>
                 <li>
-                  <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
+                  <button >
                     Approve & lock
                   </button>
                   <button
