@@ -308,7 +308,11 @@ function Home() {
       headers: myHeaders,
       body: JSON.stringify({
         query: `query MyQuery {
-  Asset(where: {lsp4TokenName: {_ilike: "%${q}%"}, isLSP7: {_eq: true}}, limit: 5) {
+  Asset(
+    where: {lsp4TokenName: {_ilike: "%${q}%"}, isLSP7: {_eq: true}}
+    limit: 15
+    order_by: {holders_aggregate: {count: desc}}
+  ) {
     id
     isLSP7
     lsp4TokenName
@@ -317,6 +321,11 @@ function Home() {
     name
     totalSupply
     owner_id
+    holders_aggregate {
+      aggregate {
+        count
+      }
+    }
   }
 }`,
       }),
