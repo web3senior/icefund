@@ -500,7 +500,10 @@ function Home() {
       },
     })
 
+    console.log(JSON.parse(metadata))
+
     const token = lsp7.data.Asset[0].id
+    console.log(token)
 
     try {
       const web3 = new Web3(auth.provider)
@@ -544,7 +547,7 @@ function Home() {
             toast.dismiss(t)
           })
       } else {
-        console.log(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value)
+
         contract.methods
           .lock(token, web3Readonly.utils.toWei(amountRef.current.value, `ether`), periodRef.current.value, metadata)
           .send({
@@ -605,6 +608,8 @@ function Home() {
 
   useEffect(() => {
     console.clear()
+
+    console.log(web3Readonly.utils.toWei('0.00000000000000001',`ether`))
 
     contractReadonly.methods._lockCounter().call().then(console.log)
 
@@ -715,7 +720,7 @@ function Home() {
                   <input ref={periodRef} type={`number`} step={1} name="" id="" placeholder={`Period in days`} />
                 </li>
                 <li>
-                  <button onClick={(e) => handleMint(e)} disabled={!isIconLoaded}>
+                  <button >
                     Approve & lock
                   </button>
                   <button
