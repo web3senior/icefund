@@ -310,7 +310,7 @@ function Home() {
         query: `query MyQuery {
   Asset(
     where: {lsp4TokenName: {_ilike: "%${q}%"}, isLSP7: {_eq: true}}
-    limit: 15
+    limit: 5
     order_by: {holders_aggregate: {count: desc}}
   ) {
     id
